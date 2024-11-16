@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  webapp:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - /Users/arshia/classifytheworld/app/uploads:/app/uploads
+      - /var/run/docker.sock:/var/run/docker.sock  # Add this line
+    environment:
+      FLASK_APP: app
+      FLASK_ENV: development

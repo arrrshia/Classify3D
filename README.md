@@ -1,6 +1,5 @@
 ### **README.md**
 
-```markdown
 # Classify3D
 
 ## **Features**
@@ -26,7 +25,6 @@
 ```bash
 git clone <repository-url>
 cd <repository-name>
-```
 
 ### **2. Install Dependencies**
 Install dependencies:

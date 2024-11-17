@@ -53,6 +53,15 @@ i.e
 LOCAL_PROJECT_DIR=/Users/emar/university/senior/Classify3D
 ```
 
+OPTOINAL
+If you have issues with the port inuse you can change it by adding a    `PORT` env var like so:
+
+``` env
+PORT=5500
+```
+
+If there isn't a `PORT` env var build will just default to 5000
+
 This is needed for docker to be able to find the local project directory in `/app/odm_handler.py`
 
 ### **5. Run the Application**
@@ -63,9 +72,12 @@ Run the included setup script:
 
 ### **5. Access the Application**
 Open your browser and go to:
+
 ```
-http://localhost:5500
+http://localhost:5000
 ```
+
+**Note**: unless you change it on your env file
 
 ---
 

@@ -3,10 +3,11 @@ services:
     build:
       context: .
     ports:
-      - "5500:5500"
+      - "${PORT}:${PORT}"
     volumes:
       - ./app/uploads:/app/uploads
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - FLASK_APP=app
       - FLASK_ENV=development
+      - PORT=${PORT}

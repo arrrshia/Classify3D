@@ -1,10 +1,10 @@
 import os
-import subprocess
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_file
-from werkzeug.utils import secure_filename
-from .handlers import odm, yolo
 import shutil
 import zipfile
+import subprocess
+from .handlers import odm, yolo
+from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_file
 
 main_bp = Blueprint('main', __name__)
 
@@ -39,22 +39,37 @@ def upload():
 
 @main_bp.route('/processing')
 def processing():
-    try:
-        upload_folder = current_app.config['UPLOAD_FOLDER']
-        images_folder = os.path.join(upload_folder, 'datasets', 'project', 'images')
-         # Create directories if they don't exist
-        os.makedirs(images_folder, exist_ok=True)
-        for filename in os.listdir(upload_folder):
-            file_path = os.path.join(upload_folder, filename)
-            if os.path.isfile(file_path) and filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
-                shutil.move(file_path, os.path.join(images_folder, filename))
-        print(f"Processing images in: {images_folder}")  # Debug log
-        odm.run(os.path.join(upload_folder, 'datasets'))
-        return redirect(url_for('main.results'))
-    except Exception as e:
-        print(f"Error during processing: {e}")  # Debug log for errors
-        return f"Error during processing: {e}", 500  # Return the error directly
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    images_folder = os.path.join(upload_folder, 'datasets', 'project', 'images')
 
+    try:
+        os.makedirs(images_folder, exist_ok=True)
+
+        isPicture = lambda file: file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
+        movePicture = lambda filename: shutil.move(os.path.join(upload_folder, filename), os.path.join(images_folder, filename)) if isPicture(filename) else None
+
+        list(map(movePicture, os.listdir(upload_folder)))
+
+        odm.run(os.path.join(upload_folder, 'datasets'))
+
+        return redirect(url_for('main.results'))
+
+    except Exception as e:
+        return f"Error during processing: {e}", 500
+
+@main_bp.route('/results')
+def results():
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    output_folder = os.path.join(upload_folder, 'datasets', 'project')  # Base folder for results
+
+    try:
+        # List all files in the output folder
+        result_files = [f for f in os.listdir(output_folder) if os.path.isfile(os.path.join(output_folder, f))]
+
+        return render_template('results.html', files=result_files)
+    except Exception as e:
+        print(f"Error displaying results: {e}")
+        return f"Error displaying results: {e}", 500
 
 @main_bp.route('/download-all')
 def download_all():
@@ -81,19 +96,6 @@ def download_all():
         print(f"Error creating or serving ZIP: {e}")
         return f"Error creating or serving ZIP: {e}", 500
 
-@main_bp.route('/results')
-def results():
-    upload_folder = current_app.config['UPLOAD_FOLDER']
-    output_folder = os.path.join(upload_folder, 'datasets', 'project')  # Base folder for results
-
-    try:
-        # List all files in the output folder
-        result_files = [f for f in os.listdir(output_folder) if os.path.isfile(os.path.join(output_folder, f))]
-
-        return render_template('results.html', files=result_files)
-    except Exception as e:
-        print(f"Error displaying results: {e}")
-        return f"Error displaying results: {e}", 500
         
 @main_bp.route('/download/<filename>')
 def download(filename):

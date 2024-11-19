@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-def run_odm(upload_folder):
+def run(upload_folder):
     output_folder = os.path.join(upload_folder, 'output')
     local_project_dir = os.getenv('LOCAL_PROJECT_DIR')
     os.makedirs(output_folder, exist_ok=True)
@@ -34,7 +34,8 @@ def run_odm(upload_folder):
 
         if process.returncode != 0:
             raise Exception(f"ODM processing failed: {process.stderr}")
-    except FileNotFoundError:
+    except FileNotFoundError as f:
+        logging.debug(f)
         raise Exception("Docker not found. Ensure Docker is installed and /var/run/docker.sock is accessible.")
     except Exception as e:
         raise Exception(f"Error during ODM processing: {e}")

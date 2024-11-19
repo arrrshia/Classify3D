@@ -1,6 +1,7 @@
 FROM python:3.9
 
-RUN apt-get update && apt-get install -y && apt-get clean
+RUN apt-get update && apt-get install -y docker.io && apt-get clean
+RUN apt-get install ffmpeg libsm6 libxext6 -y
 
 ENV PORT=${PORT:-5000}
 

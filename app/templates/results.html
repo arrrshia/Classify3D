@@ -8,13 +8,13 @@
     <ul>
         {% for file in files %}
         <li>
-            <a href="{{ url_for('main.download', filename=file) }}">{{ file }}</a> <!-- Link for individual file -->
+          <a href="/download/{{ file }}">{{ file }}</a>
         </li>
         {% endfor %}
     </ul>
 
     <h2>Download All</h2>
-    <a href="{{ url_for('main.download_all') }}">
+    <a href="/download/all">
         <button>Download All Results as ZIP</button>
     </a>
 </body>

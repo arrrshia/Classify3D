@@ -2,7 +2,7 @@ import os
 import subprocess
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_file
 from werkzeug.utils import secure_filename
-from .odm_handler import run_odm
+from .handlers import odm, yolo
 import shutil
 import zipfile
 
@@ -14,27 +14,28 @@ def index():
 
 @main_bp.route('/upload', methods=['GET', 'POST'])
 def upload():
-    if request.method == 'POST':
-        files = request.files.getlist('images')  # Get the list of uploaded files
-        upload_folder = current_app.config['UPLOAD_FOLDER']
+    if request.method == 'GET':
+        return render_template('upload.html')
 
-        print(f"Uploading to folder: {upload_folder}")  # Debugging
+    files = request.files.getlist('images')
+    upload_folder = current_app.config['UPLOAD_FOLDER']
 
-        if not os.path.exists(upload_folder):
-            os.makedirs(upload_folder)  # Ensure the folder exists
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
 
-        for file in files:
-            if file.filename:  # Check if the file has a name
-                filename = secure_filename(file.filename)
-                file_path = os.path.join(upload_folder, filename)
-                print(f"Saving file: {file_path}")  # Debugging
-                file.save(file_path)
+    for file in files:
+        filename = secure_filename(file.filename)
+        temp_path = os.path.join(upload_folder, filename)
+        file.save(temp_path)
 
-        print("Files uploaded successfully!")  # Debugging
-        return redirect(url_for('main.processing'))
+        results = yolo.run(temp_path) 
 
-    return render_template('upload.html')
+        processed_file_path = os.path.join(upload_folder, f"processed_{filename}")
+        results[0].save(processed_file_path)
 
+        os.remove(temp_path) 
+
+    return redirect(url_for('main.processing'))
 
 @main_bp.route('/processing')
 def processing():
@@ -48,7 +49,7 @@ def processing():
             if os.path.isfile(file_path) and filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
                 shutil.move(file_path, os.path.join(images_folder, filename))
         print(f"Processing images in: {images_folder}")  # Debug log
-        run_odm(os.path.join(upload_folder, 'datasets'))
+        odm.run(os.path.join(upload_folder, 'datasets'))
         return redirect(url_for('main.results'))
     except Exception as e:
         print(f"Error during processing: {e}")  # Debug log for errors

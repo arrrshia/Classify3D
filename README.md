@@ -22,37 +22,62 @@
 ## **Setup**
 
 ### **1. Clone the Repository**
+
 ```bash
 git clone <repository-url>
 cd <repository-name>
+```
 
 ### **2. Install Dependencies**
+
 Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### **3. Configure the Application**
+
 Ensure the `uploads` directory exists:
+
 ```bash
 mkdir -p app/uploads
 ```
 
-### **4. Build and Run the Application**
-Run the included setup script:
-```bash
-./setup_and_run.sh
+### **4. Set up the environment**
+On the parent dir create a `.env` file setting `LOCAL_PROJECT_DIR` to the absolute path to this repo's directory. 
+
+i.e 
+
+``` env
+LOCAL_PROJECT_DIR=/Users/emar/university/senior/Classify3D
 ```
 
-The script provides two options:
-- **First-Time Setup**: Replaces paths in `odm_handler.py` and `docker-compose.yml` and builds the container.
-- **Recurring Usage**: Skips path replacement and only rebuilds the container.
+OPTOINAL
+If you have issues with the port inuse you can change it by adding a    `PORT` env var like so:
+
+``` env
+PORT=5500
+```
+
+If there isn't a `PORT` env var build will just default to 5000
+
+This is needed for docker to be able to find the local project directory in `/app/odm_handler.py`
+
+### **5. Run the Application**
+Run the included setup script:
+```bash
+./run.sh
+```
 
 ### **5. Access the Application**
 Open your browser and go to:
+
 ```
 http://localhost:5000
 ```
+
+**Note**: unless you change it on your env file
 
 ---
 

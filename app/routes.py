@@ -25,15 +25,17 @@ def upload():
 
     for file in files:
         filename = secure_filename(file.filename)
-        file_path = os.path.join(upload_folder, filename)
+        temp_path = os.path.join(upload_folder, filename)
+        file.save(temp_path)
 
-        yolo.run(file_path)
+        results = yolo.run(temp_path) 
 
-        file.save(file_path)
+        processed_file_path = os.path.join(upload_folder, f"processed_{filename}")
+        results[0].save(processed_file_path)
 
-    print("Files uploaded successfully!")
+        os.remove(temp_path) 
+
     return redirect(url_for('main.processing'))
-
 
 @main_bp.route('/processing')
 def processing():
